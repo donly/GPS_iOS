@@ -79,6 +79,7 @@
     NSTimeInterval interval = [newLocation.timestamp timeIntervalSinceDate:oldLocation.timestamp];
     NSLog(@"%lf", interval);
     
+    // 取到精确GPS位置后停止更新
     if (interval < 3) {
         // 停止更新
         [locationManager stopUpdatingLocation];
