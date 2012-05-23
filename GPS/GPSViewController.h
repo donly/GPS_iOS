@@ -16,4 +16,7 @@
 
 - (IBAction)openGPS:(id)sender;
 
+@property (nonatomic, retain) IBOutlet UILabel *latitudeLabel;
+@property (nonatomic, retain) IBOutlet UILabel *longitudeLabel;
+
 @end
