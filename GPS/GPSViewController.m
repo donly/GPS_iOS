@@ -14,8 +14,15 @@
 
 @implementation GPSViewController
 
+@synthesize latitudeLabel;
+@synthesize longitudeLabel;
+
+
 - (void)dealloc {
     [locationManager release];
+    
+    self.latitudeLabel = nil;
+    self.longitudeLabel = nil;
     
     [super dealloc];
 }
@@ -83,6 +90,9 @@
         // 停止更新
         [locationManager stopUpdatingLocation];
     }
+    
+    latitudeLabel.text = [NSString stringWithFormat:@"%f", newLocation.coordinate.latitude];
+    longitudeLabel.text = [NSString stringWithFormat:@"%f", newLocation.coordinate.longitude];
 }
 
 @end
