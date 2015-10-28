@@ -24,23 +24,11 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
-
-    // Create a location manager instance to determine if location services are enabled. This manager instance will be
-    // immediately released afterwards.
-    CLLocationManager *manager = [[CLLocationManager alloc] init];
-    if (manager.locationServicesEnabled == NO) {
-        UIAlertView *servicesDisabledAlert = [[UIAlertView alloc] initWithTitle:@"Location Services Disabled" message:@"You currently have all location services for this device disabled. If you proceed, you will be asked to confirm whether location services should be reenabled." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [servicesDisabledAlert show];
-        [servicesDisabledAlert release];
-    }
-    else {
-        GPSViewController *viewController = [[GPSViewController alloc] initWithNibName:@"GPSViewController"
-                                                                                bundle:nil];
-        [self.window setRootViewController:viewController];
-        [viewController release];
-    }
     
-    [manager release];
+    GPSViewController *viewController = [[GPSViewController alloc] initWithNibName:@"GPSViewController"
+                                                                            bundle:nil];
+    [self.window setRootViewController:viewController];
+    [viewController release];
     
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];

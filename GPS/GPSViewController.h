@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
-@interface GPSViewController : UIViewController <CLLocationManagerDelegate>
+@interface GPSViewController : UIViewController <CLLocationManagerDelegate, UIAlertViewDelegate>
 {
     CLLocationManager *locationManager;
 }

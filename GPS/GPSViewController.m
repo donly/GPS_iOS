@@ -45,15 +45,53 @@
 }
 
 #pragma mark - Custom methods
+
 - (IBAction)openGPS:(id)sender {
-    if (locationManager == nil) {
-        locationManager = [[CLLocationManager alloc] init];
-        locationManager.delegate = self;
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest;  // 越精确，越耗电！
+    // Create a location manager instance to determine if location services are enabled. This manager instance will be
+    // immediately released afterwards.
+    if (![CLLocationManager locationServicesEnabled]) {
+        [self showOpenLocationServiceAlertView];
     }
-    
-    [locationManager startUpdatingLocation];  // 开始
+    else {
+        if (locationManager == nil) {
+            locationManager = [[CLLocationManager alloc] init];
+            locationManager.delegate = self;
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest;  // more accurate, the more power
+        }
+        
+        [locationManager startUpdatingLocation];
+        
+        // Once configured, the location manager must be "started"
+        //
+        // for iOS 8, specific user level permission is required,
+        // "when-in-use" authorization grants access to the user's location
+        //
+        // important: be sure to include NSLocationWhenInUseUsageDescription along with its
+        // explanation string in your Info.plist or startUpdatingLocation will not work.
+        //
+        if ([locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
+            [locationManager requestWhenInUseAuthorization];
+        }
+        
+        [locationManager startUpdatingLocation];
+        
+        if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied) {
+            [self showOpenLocationServiceAlertView];
+        }
+
+    }
 }
+
+- (void)showOpenLocationServiceAlertView {
+    UIAlertView *servicesDisabledAlert = [[UIAlertView alloc] initWithTitle:@"Location Services Disabled"
+                                                                    message:@"You currently have all location services for this device disabled. If you proceed, you will be asked to confirm whether location services should be reenabled."
+                                                                   delegate:self
+                                                          cancelButtonTitle:@"Ok"
+                                                          otherButtonTitles:@"Setting", nil];
+    [servicesDisabledAlert show];
+    [servicesDisabledAlert release];
+}
+
 
 #pragma mark - CLLocationManagerDelegate
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
@@ -68,7 +106,7 @@
             NSLog(@"The network was unavailable or a network error occurred.");
             break;
         default:
-            NSLog(@"未定义错误");
+            NSLog(@"undefine");
             break;
     }
 }
@@ -86,14 +124,29 @@
     NSTimeInterval interval = [newLocation.timestamp timeIntervalSinceDate:oldLocation.timestamp];
     NSLog(@"%lf", interval);
     
-    // 取到精确GPS位置后停止更新
     if (interval < 3) {
-        // 停止更新
         [locationManager stopUpdatingLocation];
     }
     
     latitudeLabel.text = [NSString stringWithFormat:@"%f", newLocation.coordinate.latitude];
     longitudeLabel.text = [NSString stringWithFormat:@"%f", newLocation.coordinate.longitude];
 }
+
+#pragma mark - UIAlertViewDelegate
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (alertView.cancelButtonIndex != buttonIndex) {
+        [self openSettings];
+    }
+}
+
+- (void)openSettings
+{
+    BOOL canOpenSettings = (&UIApplicationOpenSettingsURLString != NULL);
+    if (canOpenSettings) {
+        NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+        [[UIApplication sharedApplication] openURL:url];
+    }
+}
+
 
 @end
